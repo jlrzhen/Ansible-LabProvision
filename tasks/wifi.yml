@@ -8,6 +8,7 @@
         - linux-headers-generic
         - build-essential
         - dkms
+        update_cache: yes
 
     - name: Clone a github repository
       git:

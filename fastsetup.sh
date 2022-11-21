@@ -1,3 +1,3 @@
-ansible-playbook roles/common/tasks/main.yml \
+ansible-playbook tasks/main.yml \
 -i hosts \
 -K

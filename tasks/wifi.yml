@@ -25,11 +25,15 @@
         echo -e "8192eu\n\nloop" | tee /etc/modules
         echo "options 8192eu rtw_power_mgnt=0 rtw_enusbss=0" | tee /etc/modprobe.d/8192eu.conf
         update-grub; update-initramfs -u
-        systemctl reboot -i
       args:
         chdir: /home/ubuntu/rtl8192eu-linux-driver/
 
-    - name: Wait for the reboot to complete if there was a change.
+    - name: Reboot
+      shell: "sleep 5 && reboot"
+      async: 1
+      poll: 0
+
+    - name: Wait for the reboot to complete
       wait_for_connection:
         connect_timeout: 20
         sleep: 5

@@ -1,0 +1,42 @@
+- hosts: all
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Install a list of packages
+      ansible.builtin.apt:
+        pkg:
+        - linux-headers-generic
+        - build-essential
+        - dkms
+
+    - name: Clone a github repository
+      git:
+        repo: https://github.com/Mange/rtl8192eu-linux-driver
+        dest: /home/ubuntu/rtl8192eu-linux-driver/
+        clone: yes
+        update: yes
+    
+    - name: build driver
+      shell: |
+        dkms add .
+        dkms install rtl8192eu/1.0
+        echo "blacklist rtl8xxxu" | tee /etc/modprobe.d/rtl8xxxu.conf
+        echo -e "8192eu\n\nloop" | tee /etc/modules
+        echo "options 8192eu rtw_power_mgnt=0 rtw_enusbss=0" | tee /etc/modprobe.d/8192eu.conf
+        update-grub; update-initramfs -u
+        systemctl reboot -i
+      args:
+        chdir: /home/ubuntu/rtl8192eu-linux-driver/
+
+    - name: Wait for the reboot to complete if there was a change.
+      wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 5
+        timeout: 300
+
+    - name: check module
+      shell: sudo lshw -c network
+      register: output
+
+    - debug: var=ps.stdout_lines

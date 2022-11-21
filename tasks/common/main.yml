@@ -1,0 +1,8 @@
+- name: Sync hc
+  import_playbook: clock.yml
+
+- name: Make sure auto updates (prevents apt access) are off
+  import_playbook: disable-auto-updates.yml
+
+- name: Install wifi driver
+  import_playbook: wifi.yml
